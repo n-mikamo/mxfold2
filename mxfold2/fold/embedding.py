@@ -3,13 +3,14 @@ from __future__ import annotations
 from collections import defaultdict
 
 import numpy as np
+from numpy.core.fromnumeric import transpose
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class OneHotEmbedding(nn.Module):
-    def __init__(self, ksize: int = 0) -> None:
+    def __init__(self, ksize: int = 0) -> None: 
         super(OneHotEmbedding, self).__init__()
         self.n_out = 4
         self.ksize = ksize
@@ -41,12 +42,36 @@ class SparseEmbedding(nn.Module):
     def __init__(self, dim: int) -> None:
         super(SparseEmbedding, self).__init__()
         self.n_out = dim
+        #以下の6は系列長(vocb), dimは何次元のベクトルにするか(今回は64としている)
+        #padding_idx=0は0番目の要素を無視するという意味
         self.embedding = nn.Embedding(6, dim, padding_idx=0)
         self.vocb = defaultdict(lambda: 5,
             {'0': 0, 'a': 1, 'c': 2, 'g': 3, 't': 4, 'u': 4})
-
 
     def forward(self, seq: str) -> torch.Tensor:
         seq2 = torch.LongTensor([[self.vocb[c] for c in s.lower()] for s in seq])
         seq3 = seq2.to(self.embedding.weight.device)
         return self.embedding(seq3).transpose(1, 2)
+
+
+A_fp_array = np.loadtxt('A_np_txt')
+A_fp = torch.from_numpy(A_fp_array)
+C_fp_array = np.loadtxt('C_np_txt')
+C_fp = torch.from_numpy(C_fp_array)
+G_fp_array = np.loadtxt('G_np_txt')
+G_fp = torch.from_numpy(G_fp_array)
+U_fp_array = np.loadtxt('U_np_txt')
+U_fp = torch.from_numpy(U_fp_array)
+
+class Fingerprint(nn.Module):
+    def __init__(self, dim: int) -> None:
+        super(Fingerprint, self).__init__()
+        self.n_out = dim
+        self.embedding = nn.Embedding(6, dim, padding_idx=0)
+        self.ecpf = defaultdict(lambda: 5,
+            {'0': 0, 'a': A_fp, 'c': C_fp, 'g': G_fp, 't': U_fp, 'u': U_fp})
+
+    def forward(self, seq: str) -> torch.Tensor:
+        seq2 = [[self.ecpf[c] for c in s.lower()] for s in seq]
+        #linear
+        return self.embedding(seq2), #transpose(1, 2)
