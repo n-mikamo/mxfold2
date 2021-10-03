@@ -3,11 +3,12 @@ from __future__ import annotations
 from collections import defaultdict
 
 import numpy as np
-from numpy.core.fromnumeric import transpose
+from numpy.core.fromnumeric import reshape, transpose
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+#seq = ['AUGUCUAGUCUAGUCUG']
 
 class OneHotEmbedding(nn.Module):
     def __init__(self, ksize: int = 0) -> None: 
@@ -37,7 +38,6 @@ class OneHotEmbedding(nn.Module):
         seq3 = [ self.encode(s) for s in seq2 ]
         return torch.from_numpy(np.stack(seq3)) # pylint: disable=no-member
 
-
 class SparseEmbedding(nn.Module):
     def __init__(self, dim: int) -> None:
         super(SparseEmbedding, self).__init__()
@@ -53,6 +53,17 @@ class SparseEmbedding(nn.Module):
         seq3 = seq2.to(self.embedding.weight.device)
         return self.embedding(seq3).transpose(1, 2)
 
+
+#S = SparseEmbedding(1)
+#print(S.forward(seq2).shape)
+
+#    def check_cnn_size(self, dim):
+#        out = self.conv_layers(dim)
+#        print(dim)
+#        return out
+
+#S = SparseEmbedding()
+#S.check_cnn_size()
 
 A_fp_array = np.loadtxt('A_np_txt')
 A_fp = torch.from_numpy(A_fp_array)
@@ -73,5 +84,5 @@ class Fingerprint(nn.Module):
 
     def forward(self, seq: str) -> torch.Tensor:
         seq2 = [[self.ecpf[c] for c in s.lower()] for s in seq]
-        #linear
-        return self.embedding(seq2), #transpose(1, 2)
+        linear = nn.Linear(1024, 64)
+        return self.linear(seq2), #transpose(1, 2)
