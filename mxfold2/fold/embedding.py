@@ -7,8 +7,9 @@ from numpy.core.fromnumeric import reshape, transpose
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+#import torchvision.transforms.functional as TF
 
-#seq = ['AUGUCUAGUCUAGUCUG']
+seq = ['AUGUCUAGUCUAGUCUG']
 
 class OneHotEmbedding(nn.Module):
     def __init__(self, ksize: int = 0) -> None: 
@@ -53,17 +54,11 @@ class SparseEmbedding(nn.Module):
         seq3 = seq2.to(self.embedding.weight.device)
         return self.embedding(seq3).transpose(1, 2)
 
+S = SparseEmbedding(1)
+print('Sparse = ', S.forward(seq).shape)
 
-#S = SparseEmbedding(1)
-#print(S.forward(seq2).shape)
 
-#    def check_cnn_size(self, dim):
-#        out = self.conv_layers(dim)
-#        print(dim)
-#        return out
 
-#S = SparseEmbedding()
-#S.check_cnn_size()
 
 A_fp_array = np.loadtxt('A_np_txt')
 A_fp = torch.from_numpy(A_fp_array)
@@ -74,6 +69,17 @@ G_fp = torch.from_numpy(G_fp_array)
 U_fp_array = np.loadtxt('U_np_txt')
 U_fp = torch.from_numpy(U_fp_array)
 
+class Linear(nn.Module):
+    def __init__(self, in_features, out_features, seq):
+        super().__init__()  # 基底クラスの初期化
+        self.in_features = in_features
+        self.out_features = out_features
+        self.seq = seq
+
+    def forward(self, seq):
+        seq
+        pass
+
 class Fingerprint(nn.Module):
     def __init__(self, dim: int) -> None:
         super(Fingerprint, self).__init__()
@@ -82,7 +88,16 @@ class Fingerprint(nn.Module):
         self.ecpf = defaultdict(lambda: 5,
             {'0': 0, 'a': A_fp, 'c': C_fp, 'g': G_fp, 't': U_fp, 'u': U_fp})
 
-    def forward(self, seq: str) -> torch.Tensor:
+    def encode(self, seq) -> np.ndarray:
         seq2 = [[self.ecpf[c] for c in s.lower()] for s in seq]
-        linear = nn.Linear(1024, 64)
-        return self.linear(seq2), #transpose(1, 2)
+        seq3 = np.vstack(seq2)
+        return seq3
+
+    def forward(self, seq: str) -> torch.Tensor:
+        seq = self.encode(seq)
+        L = Linear(in_features=1024, out_features=64, seq=seq)
+        seq5 = L.seq
+        return seq5#, transpose(1, 2)
+
+F = Fingerprint(1)
+print('Finger = ', F.forward(seq).shape)
