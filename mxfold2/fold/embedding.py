@@ -7,7 +7,6 @@ from numpy.core.fromnumeric import reshape, transpose
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-#import torchvision.transforms.functional as TF
 
 seq = ['AUGUCUAGUCUAGUCUG']
 
@@ -51,53 +50,38 @@ class SparseEmbedding(nn.Module):
 
     def forward(self, seq: str) -> torch.Tensor:
         seq2 = torch.LongTensor([[self.vocb[c] for c in s.lower()] for s in seq])
+        #print(seq2)
         seq3 = seq2.to(self.embedding.weight.device)
         return self.embedding(seq3).transpose(1, 2)
 
-S = SparseEmbedding(1)
-print('Sparse = ', S.forward(seq).shape)
-
-
+#S = SparseEmbedding(64)
+#print('Sparse = ', S.forward(seq).shape)
 
 
 A_fp_array = np.loadtxt('A_np_txt')
-A_fp = torch.from_numpy(A_fp_array)
+A_fp = torch.from_numpy(A_fp_array).to(torch.float)
 C_fp_array = np.loadtxt('C_np_txt')
-C_fp = torch.from_numpy(C_fp_array)
+C_fp = torch.from_numpy(C_fp_array).to(torch.float)
 G_fp_array = np.loadtxt('G_np_txt')
-G_fp = torch.from_numpy(G_fp_array)
+G_fp = torch.from_numpy(G_fp_array).to(torch.float)
 U_fp_array = np.loadtxt('U_np_txt')
-U_fp = torch.from_numpy(U_fp_array)
+U_fp = torch.from_numpy(U_fp_array).to(torch.float)
 
-class Linear(nn.Module):
-    def __init__(self, in_features, out_features, seq):
-        super().__init__()  # 基底クラスの初期化
-        self.in_features = in_features
-        self.out_features = out_features
-        self.seq = seq
 
-    def forward(self, seq):
-        seq
-        pass
-
-class Fingerprint(nn.Module):
+class FingerprintEmbedding(nn.Module):
     def __init__(self, dim: int) -> None:
-        super(Fingerprint, self).__init__()
+        super(FingerprintEmbedding, self).__init__()
         self.n_out = dim
-        self.embedding = nn.Embedding(6, dim, padding_idx=0)
-        self.ecpf = defaultdict(lambda: 5,
+        self.linear = nn.Linear(1024, dim)
+        self.ecfp = defaultdict(lambda: 5,
             {'0': 0, 'a': A_fp, 'c': C_fp, 'g': G_fp, 't': U_fp, 'u': U_fp})
 
-    def encode(self, seq) -> np.ndarray:
-        seq2 = [[self.ecpf[c] for c in s.lower()] for s in seq]
-        seq3 = np.vstack(seq2)
-        return seq3
-
+    
     def forward(self, seq: str) -> torch.Tensor:
-        seq = self.encode(seq)
-        L = Linear(in_features=1024, out_features=64, seq=seq)
-        seq5 = L.seq
-        return seq5#, transpose(1, 2)
+        seq2 = [[self.linear(self.ecfp[c]) for c in s.lower()] for s in seq] 
+        seq2 = [torch.vstack(s).transpose(0, 1) for s in seq2]
+        seq2 = torch.vstack(seq2)
+        return seq2.reshape(-1, seq2.shape[0], seq2.shape[1])
 
-F = Fingerprint(1)
-print('Finger = ', F.forward(seq).shape)
+#FE = FingerprintEmbedding(64)
+#print('FingerprintEmbedding = ', FE.forward(seq).shape)
