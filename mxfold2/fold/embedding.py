@@ -5,10 +5,11 @@ from collections import defaultdict
 import numpy as np
 from numpy.core.fromnumeric import reshape, transpose
 import torch
+from torch._C import ParameterDict
 import torch.nn as nn
 import torch.nn.functional as F
 
-seq = ['AUGUCUAGUCUAGUCUG']
+#seq = ['AUGUCUAGUCUAGUCUG']
 
 class OneHotEmbedding(nn.Module):
     def __init__(self, ksize: int = 0) -> None: 
@@ -73,11 +74,19 @@ class FingerprintEmbedding(nn.Module):
         super(FingerprintEmbedding, self).__init__()
         self.n_out = dim
         self.linear = nn.Linear(1024, dim)
-        self.ecfp = defaultdict(lambda: 5,
-            {'0': 0, 'a': A_fp, 'c': C_fp, 'g': G_fp, 't': U_fp, 'u': U_fp})
+        #self.ecfp = nn.ParameterDict({'0': torch.zeros(1024), 'a': A_fp, 'c': C_fp, 'g': G_fp, 't': U_fp, 'u': U_fp})
+        self.A_fp = nn.Parameter(A_fp)
+        self.C_fp = nn.Parameter(C_fp)
+        self.G_fp = nn.Parameter(G_fp)
+        self.U_fp = nn.Parameter(U_fp)
+        self.Z_fp = nn.Parameter(torch.zeros(1024))
+        self.O_fp = nn.Parameter(torch.zeros(1024))
+        self.ecfp = defaultdict(lambda: self.O_fp,
+            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp})
 
     
     def forward(self, seq: str) -> torch.Tensor:
+        #seq2 = [[self.linear(self.ecfp[c].to(device=self.linear.weight.device)) for c in s.lower()] for s in seq] 
         seq2 = [[self.linear(self.ecfp[c]) for c in s.lower()] for s in seq] 
         seq2 = [torch.vstack(s).transpose(0, 1) for s in seq2]
         seq2 = torch.vstack(seq2)
