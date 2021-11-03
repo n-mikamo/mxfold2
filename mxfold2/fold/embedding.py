@@ -94,3 +94,4 @@ class FingerprintEmbedding(nn.Module):
 
 #FE = FingerprintEmbedding(64)
 #print('FingerprintEmbedding = ', FE.forward(seq).shape)
+#print ('mxfold2')
