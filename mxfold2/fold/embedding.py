@@ -67,7 +67,12 @@ G_fp_array = np.loadtxt('G_np_txt')
 G_fp = torch.from_numpy(G_fp_array).to(torch.float)
 U_fp_array = np.loadtxt('U_np_txt')
 U_fp = torch.from_numpy(U_fp_array).to(torch.float)
-
+I_fp_array = np.loadtxt('I_np_txt')
+I_fp = torch.from_numpy(I_fp_array).to(torch.float)
+P_fp_array = np.loadtxt('P_np_txt')
+P_fp = torch.from_numpy(P_fp_array).to(torch.float)
+M_fp_array = np.loadtxt('M_np_txt')
+M_fp = torch.from_numpy(M_fp_array).to(torch.float)
 
 class FingerprintEmbedding(nn.Module):
     def __init__(self, dim: int) -> None:
@@ -79,10 +84,13 @@ class FingerprintEmbedding(nn.Module):
         self.C_fp = nn.Parameter(C_fp)
         self.G_fp = nn.Parameter(G_fp)
         self.U_fp = nn.Parameter(U_fp)
+        self.I_fp = nn.Parameter(I_fp)
+        self.P_fp = nn.Parameter(P_fp)
+        self.M_fp = nn.Parameter(M_fp)
         self.Z_fp = nn.Parameter(torch.zeros(1024))
         self.O_fp = nn.Parameter(torch.zeros(1024))
         self.ecfp = defaultdict(lambda: self.O_fp,
-            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp})
+            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp, 'i': self.I_fp, 'p': self.P_fp, 'm': self.M_fp})
 
     
     def forward(self, seq: str) -> torch.Tensor:
@@ -94,3 +102,4 @@ class FingerprintEmbedding(nn.Module):
 
 #FE = FingerprintEmbedding(64)
 #print('FingerprintEmbedding = ', FE.forward(seq).shape)
+#print ('mxfold2')
