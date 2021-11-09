@@ -60,6 +60,7 @@ class AbstractFold(nn.Module):
                 v, pred, pair = self.predict(seq[i], param_on_cpu,
                             max_internal_length=max_internal_length if max_internal_length is not None else len(seq[i]),
                             max_helix_length=max_helix_length,
+                            allowed_pairs="aucgguiciuiapapcpgpumu",#a-u, u-a, ...が塩基対を組むことを指定している。大文字小文字を区別しない。iuiciaのように付け加える。I, φ, M6Aについて
                             constraint=constraint[i].tolist() if constraint is not None else None, 
                             reference=reference[i].tolist() if reference is not None else None, 
                             loss_pos_paired=loss_pos_paired, loss_neg_paired=loss_neg_paired,
@@ -68,6 +69,7 @@ class AbstractFold(nn.Module):
                     pf, bpp = self.partfunc(seq[i], param_on_cpu,
                                 max_internal_length=max_internal_length if max_internal_length is not None else len(seq[i]),
                                 max_helix_length=max_helix_length,
+                                allowed_pairs="aucgguiciuiapapcpgpumu",#上を書き換えたらこっちも書き換える。
                                 constraint=constraint[i].tolist() if constraint is not None else None, 
                                 reference=reference[i].tolist() if reference is not None else None, 
                                 loss_pos_paired=loss_pos_paired, loss_neg_paired=loss_neg_paired,
