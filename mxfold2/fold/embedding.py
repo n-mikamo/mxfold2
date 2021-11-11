@@ -88,9 +88,9 @@ class FingerprintEmbedding(nn.Module):
         self.P_fp = nn.Parameter(P_fp)
         self.M_fp = nn.Parameter(M_fp)
         self.Z_fp = nn.Parameter(torch.zeros(1024))
-        self.O_fp = nn.Parameter(torch.zeros(1024))
+        self.N_fp = nn.Parameter(torch.zeros(1024))
         self.ecfp = defaultdict(lambda: self.O_fp,
-            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp, 'i': self.I_fp, 'p': self.P_fp, 'm': self.M_fp})
+            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp, 'i': self.I_fp, 'p': self.P_fp, 'm': self.M_fp, 'n': self.N_fp})
 
     
     def forward(self, seq: str) -> torch.Tensor:
