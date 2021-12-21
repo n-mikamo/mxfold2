@@ -80,17 +80,17 @@ class FingerprintEmbedding(nn.Module):
         self.n_out = dim
         self.linear = nn.Linear(1024, dim)
         #self.ecfp = nn.ParameterDict({'0': torch.zeros(1024), 'a': A_fp, 'c': C_fp, 'g': G_fp, 't': U_fp, 'u': U_fp})
-        self.A_fp = nn.Parameter(A_fp)
-        self.C_fp = nn.Parameter(C_fp)
-        self.G_fp = nn.Parameter(G_fp)
-        self.U_fp = nn.Parameter(U_fp)
-        self.I_fp = nn.Parameter(I_fp)
-        self.P_fp = nn.Parameter(P_fp)
-        self.M_fp = nn.Parameter(M_fp)
-        self.Z_fp = nn.Parameter(torch.zeros(1024))
-        self.N_fp = nn.Parameter(torch.zeros(1024))
-        self.ecfp = defaultdict(lambda: self.O_fp,
-            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp, 'i': self.I_fp, 'p': self.P_fp, 'm': self.M_fp, 'n': self.N_fp})
+        self.A_fp = nn.Parameter(A_fp, requires_grad=False)
+        self.C_fp = nn.Parameter(C_fp, requires_grad=False)
+        self.G_fp = nn.Parameter(G_fp, requires_grad=False)
+        self.U_fp = nn.Parameter(U_fp, requires_grad=False)
+        self.I_fp = nn.Parameter(I_fp, requires_grad=False)
+        self.P_fp = nn.Parameter(P_fp, requires_grad=False)
+        self.M_fp = nn.Parameter(M_fp, requires_grad=False)
+        self.Z_fp = nn.Parameter(torch.zeros(1024), requires_grad=False)
+        self.N_fp = nn.Parameter(torch.zeros(1024), requires_grad=False)
+        self.ecfp = defaultdict(lambda: self.N_fp,
+            {'0': self.Z_fp, 'a': self.A_fp, 'c': self.C_fp, 'g': self.G_fp, 't': self.U_fp, 'u': self.U_fp, 'i': self.I_fp, 'p': self.P_fp, 'm': self.M_fp})
 
     
     def forward(self, seq: str) -> torch.Tensor:
