@@ -37,7 +37,7 @@ for tr in TrainSetA; do
     --num-paired-filter 64 --paired-filter-size 5 --num-paired-filter 64 --paired-filter-size 3 \
 	data/$tr-mod.lst
 
-  for te in TrainSetA TestSetA TestSetB pdb-mod; do
+  for te in TrainSetA TestSetA TestSetB pdb_mod; do
     mkdir -p $tr-$te
     poetry run mxfold2 predict --gpu ${GPU} @$tr-mod.conf --bpseq $tr-$te --result $tr-$te.res data/$te.lst
     echo
