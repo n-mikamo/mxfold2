@@ -14,13 +14,13 @@ import torch.nn.functional as F
 class OneHotEmbedding(nn.Module):
     def __init__(self, ksize: int = 0) -> None: 
         super(OneHotEmbedding, self).__init__()
-        self.n_out = 4
+        self.n_out = 7
         self.ksize = ksize
-        eye = np.identity(4, dtype=np.float32)
-        zero = np.zeros(4, dtype=np.float32)
+        eye = np.identity(7, dtype=np.float32)
+        zero = np.zeros(7, dtype=np.float32)
         self.onehot: defaultdict[str, np.ndarray] = defaultdict(
-            lambda: np.ones(4, dtype=np.float32)/4, 
-            {'a': eye[0], 'c': eye[1], 'g': eye[2], 't': eye[3], 'u': eye[3], '0': zero} )
+            lambda: np.ones(7, dtype=np.float32)/7, 
+            {'a': eye[0], 'c': eye[1], 'g': eye[2], 't': eye[3], 'u': eye[3], 'i': eye[4], 'p': eye[5], 'm': eye[6], '0': zero} )
 
     def encode(self, seq) -> np.ndarray:
         seq = [ self.onehot[s] for s in seq.lower() ]
@@ -45,9 +45,9 @@ class SparseEmbedding(nn.Module):
         self.n_out = dim
         #以下の6は系列長(vocb), dimは何次元のベクトルにするか(今回は64としている)
         #padding_idx=0は0番目の要素を無視するという意味
-        self.embedding = nn.Embedding(6, dim, padding_idx=0)
-        self.vocb = defaultdict(lambda: 5,
-            {'0': 0, 'a': 1, 'c': 2, 'g': 3, 't': 4, 'u': 4})
+        self.embedding = nn.Embedding(9, dim, padding_idx=0)
+        self.vocb = defaultdict(lambda: 8,
+            {'0': 0, 'a': 1, 'c': 2, 'g': 3, 't': 4, 'u': 4, 'i': 5, 'p': 6, 'm': 7})
 
     def forward(self, seq: str) -> torch.Tensor:
         seq2 = torch.LongTensor([[self.vocb[c] for c in s.lower()] for s in seq])
