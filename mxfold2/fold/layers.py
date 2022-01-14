@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .embedding import OneHotEmbedding, FingerprintEmbedding#, SparseEmbedding
+from .embedding import OneHotEmbedding, SparseEmbedding#,FingerprintEmbedding 
 from .transformer import TransformerLayer
 
 
@@ -271,8 +271,8 @@ class NeuralNet(nn.Module):
 
         self.no_split_lr = no_split_lr
         self.pair_join = pair_join
-        #self.embedding = OneHotEmbedding() if embed_size == 0 else SparseEmbedding(embed_size)
-        self.embedding = OneHotEmbedding() if embed_size == 0 else FingerprintEmbedding(embed_size)
+        self.embedding = OneHotEmbedding() if embed_size == 0 else SparseEmbedding(embed_size)
+        #self.embedding = OneHotEmbedding() if embed_size == 0 else FingerprintEmbedding(embed_size)
         n_in = self.embedding.n_out
 
         if num_transformer_layers==0:
